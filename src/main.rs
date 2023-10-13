@@ -1,4 +1,4 @@
-use axum::Router;
+use axum::{routing::get, Router};
 
 mod env;
 use env::ENV;
@@ -20,7 +20,29 @@ async fn main() {
         foo: "bar".to_owned(),
     };
 
-    let app = Router::new().nest("/api", api::todo::handlers::create_router(&context));
+    let app = Router::new().nest(
+        "/api",
+        Router::new()
+            .nest(
+                "/todo",
+                Router::new()
+                    .route(
+                        "/",
+                        get(api::todo::handlers::get_all_todos)
+                            .post(api::todo::handlers::create_todo),
+                    )
+                    .nest(
+                        "/:id",
+                        Router::new().route(
+                            "/",
+                            get(api::todo::handlers::get_todo)
+                                .put(api::todo::handlers::update_todo)
+                                .delete(api::todo::handlers::delete_todo),
+                        ),
+                    ),
+            )
+            .with_state(context),
+    );
 
     let address = format!("{}:{}", ENV.host, ENV.port);
 

@@ -1,8 +1,7 @@
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
-    routing::get,
-    Json, Router,
+    Json,
 };
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -15,34 +14,37 @@ struct TodoResponse {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct CreateTodoDto {
+struct CreateTodoDto {
     pub name: String,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct UpdateTodoDto {
+struct UpdateTodoDto {
     pub name: String,
 }
 
-async fn get_all_todos(State(state): State<Context>) -> impl IntoResponse {
+pub async fn get_all_todos(State(state): State<Context>) -> impl IntoResponse {
     dbg!("TODO: Get All Todos");
 
     (StatusCode::OK, Json("Got All Todos!"))
 }
 
-async fn get_todo(State(state): State<Context>, Path(todo_id): Path<String>) -> impl IntoResponse {
+pub async fn get_todo(
+    State(state): State<Context>,
+    Path(todo_id): Path<String>,
+) -> impl IntoResponse {
     dbg!("TODO: Get Todo by Id");
 
     (StatusCode::OK, Json("Got Todo!"))
 }
 
-async fn create_todo(State(state): State<Context>) -> impl IntoResponse {
+pub async fn create_todo(State(state): State<Context>) -> impl IntoResponse {
     dbg!("TODO: Create Todo");
 
     (StatusCode::OK, Json("Created Todo!"))
 }
 
-async fn update_todo(
+pub async fn update_todo(
     State(state): State<Context>,
     Path(todo_id): Path<String>,
 ) -> impl IntoResponse {
@@ -51,25 +53,11 @@ async fn update_todo(
     (StatusCode::OK, Json("Updated Todo!"))
 }
 
-async fn delete_todo(
+pub async fn delete_todo(
     State(state): State<Context>,
     Path(todo_id): Path<String>,
 ) -> impl IntoResponse {
     dbg!("TODO: Delete Todo");
 
     (StatusCode::OK, Json("Deleted Todo!"))
-}
-
-pub fn create_router(context: &Context) -> Router {
-    Router::new()
-        .nest(
-            "/todo",
-            Router::new()
-                .route("/", get(get_all_todos).post(create_todo))
-                .nest(
-                    "/:id",
-                    Router::new().route("/", get(get_todo).put(update_todo).delete(delete_todo)),
-                ),
-        )
-        .with_state(context.to_owned())
 }
