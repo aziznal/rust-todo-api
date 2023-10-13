@@ -9,6 +9,8 @@ mod api {
     }
 }
 
+use api::todo;
+
 #[derive(Clone, Debug)]
 pub struct Context {
     pub foo: String,
@@ -28,16 +30,16 @@ async fn main() {
                 Router::new()
                     .route(
                         "/",
-                        get(api::todo::handlers::get_all_todos)
-                            .post(api::todo::handlers::create_todo),
+                        get(todo::handlers::get_all_todos)
+                            .post(todo::handlers::create_todo),
                     )
                     .nest(
                         "/:id",
                         Router::new().route(
                             "/",
-                            get(api::todo::handlers::get_todo)
-                                .put(api::todo::handlers::update_todo)
-                                .delete(api::todo::handlers::delete_todo),
+                            get(todo::handlers::get_todo)
+                                .put(todo::handlers::update_todo)
+                                .delete(todo::handlers::delete_todo),
                         ),
                     ),
             )
